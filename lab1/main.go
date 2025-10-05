@@ -5,28 +5,6 @@ import (
 	"math"
 )
 
-func binarySearch(arr []int, n int) int {
-
-	l := 0
-	r := len(arr)
-	
-	for l != r {
-		k := (l + r) / 2
-
-		if arr[k] == n {
-			return k
-		}
-
-		if arr[k] > n {
-			r = k
-		} else {
-			l = k + 1
-		}
-
-	}
-	return l
-}
-
 type Matrix interface{
 	Add(other Matrix) Matrix
 	Substract(other Matrix) Matrix
@@ -37,38 +15,47 @@ type Matrix interface{
 }
 
 type SquareMatrix struct{
-	size int
 	data [][]float64
 }
 
-// func (m SquareMatrix) Add(other SquareMatrix) SquareMatrix{
+func (m SquareMatrix) Add(other SquareMatrix) SquareMatrix{
+	res := m
+	for i := range(res.data){
+		for j:= range(res.data[i]){
+			res.data[i][j] += other.data[i][j]
+		}
+	}
+	return res
+}
 
-// }
-
-
+func (m SquareMatrix) String() string{
+	res := ""
+	for i := range(m.data){
+		for j := range(m.data[i]){
+			res += fmt.Sprintf("%10.5f", m.data[i][j])
+		}
+		res += "\n"
+	}
+	return res
+}
 
 func main() {
 
-	matrix := make([][]float64, 15)
-	for i := range(matrix) {
-		matrix[i] = make([]float64, 15)
-		for j := range(matrix[i]){
+	matrix := &SquareMatrix{data: make([][]float64, 15)} 
+	for i := range(matrix.data) {
+		matrix.data[i] = make([]float64, 15)
+		for j := range(matrix.data[i]){
 			if i == j{
-				matrix[i][j] = 5 * math.Sqrt(float64(i+1))
+				matrix.data[i][j] = 5 * math.Sqrt(float64(i+1))
 				continue
 			}
 			if i == j + 1{
-				matrix[i][j] = -0.01 * (math.Sqrt(float64(i+1)) + float64(j+1))
+				matrix.data[i][j] = -0.01 * (math.Sqrt(float64(i+1)) + float64(j+1))
 			}
 		}
 	}
 
-	for _, row := range(matrix){
-		for _, el := range(row){
-			fmt.Printf("%10.5f",el)
-		}
-		fmt.Println()
-	}
+	fmt.Println(matrix.String())
 
 	// метод отражений
 
