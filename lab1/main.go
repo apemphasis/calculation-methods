@@ -5,17 +5,21 @@ import (
 	"math"
 )
 
-type Matrix interface{
-	Add(other Matrix) Matrix
-	Substract(other Matrix) Matrix
-	Mult(other Matrix) Matrix
-	Transpose() Matrix
-	String() string
-	Copy() Matrix
-}
-
 type SquareMatrix struct{
 	data [][]float64
+}
+
+func NewSquareMatrix(data [][]float64) SquareMatrix{
+	n := len(data)
+
+	new_data := make([][]float64, n)
+
+	for i := range(new_data){
+		new_data[i] = make([]float64, n)
+		copy(new_data[i], data[i])
+	}
+
+	return SquareMatrix{data: new_data}
 }
 
 func (m SquareMatrix) Add(other SquareMatrix) SquareMatrix{
@@ -41,7 +45,7 @@ func (m SquareMatrix) String() string{
 
 func main() {
 
-	matrix := &SquareMatrix{data: make([][]float64, 15)} 
+	matrix := SquareMatrix{data: make([][]float64, 15)} 
 	for i := range(matrix.data) {
 		matrix.data[i] = make([]float64, 15)
 		for j := range(matrix.data[i]){
@@ -55,9 +59,12 @@ func main() {
 		}
 	}
 
-	fmt.Println(matrix.String())
+	m1 := NewSquareMatrix([][]float64 {{1.0, 4, 2},{13, 5, 3}, {0.2, 1, 5.9}})
+	m2 := NewSquareMatrix([][]float64 {{1.0, 4, 2},{13, 5, 3}, {0.2, 1, 5.9}})
+
+
+	fmt.Println(m1.Add(m2).String())
 
 	// метод отражений
-
 
 }
