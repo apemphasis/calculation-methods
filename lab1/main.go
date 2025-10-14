@@ -292,6 +292,23 @@ func GaussReverse(m *SquareMatrix, b *Vector) *Vector {
 	return solution
 }
 
+func Gauss(m *SquareMatrix, b *Vector) *Vector {
+	n := len(b.data)
+
+	solution := NewVector(n)
+	solution.data[0] = b.data[0] / m.data[0][0]
+
+	for i := 1; i < n; i++{
+		sum := 0.0
+		for j := 0; j < i; j++ {
+			sum -= m.data[i][j] * solution.data[j]
+		}
+		solution.data[i] = (sum + b.data[i]) / m.data[i][i]
+	}
+
+	return solution
+}
+
 func main() {
 
 	matrix := SquareMatrix{data: make([][]float64, 15)}
@@ -299,10 +316,10 @@ func main() {
 		matrix.data[i] = make([]float64, 15)
 		for j := range matrix.data[i] {
 			if i == j {
-				matrix.data[i][j] = 5 * math.Sqrt(float64(i))
+				matrix.data[i][j] = 5 * math.Sqrt(float64(i + 1))
 				continue
 			}else{
-				matrix.data[i][j] = math.Sqrt(float64(i)) + math.Sqrt(float64(j))
+				matrix.data[i][j] = math.Sqrt(float64(i + 1)) + math.Sqrt(float64(j + 1))
 			}
 		}
 	}
@@ -310,15 +327,41 @@ func main() {
 	b_data := make([]float64, 15)
 
 	for i := range(b_data){
-		b_data[i] = 4.5 * math.Sqrt(float64(i))
+		b_data[i] = 4.5 * math.Sqrt(float64(i + 1))
 	}
 
-	//A := NewSquareMatrixFromData([][]float64{{-2, -3, 3}, {4, 3, -3}, {4, 0, 9}})
-	//b := NewVectorFromData([]float64{1, 1, 4})
+	//A := NewSquareMatrixFromData([][]float64{{4, -2, 8}, {-2, 5, 2}, {8, 2, 34}})
+	//b := NewVectorFromData([]float64{2, 3, 10})
 	A := &matrix
 	b := NewVectorFromData(b_data)
 
-	fmt.Println(b.ToStringF())
+	A_copy := NewSquareMatrixFromData(A.data)
+	D := NewSquareMatrix(len(A.data))
+	L := NewSquareMatrix(len(A.data))
+	for i := range(L.data) {
+		L.data[i][i] = 1
+	}
+
+	for k := 0; k < len(A.data) - 1; k++{
+		D.data[k][k] = A_copy.data[k][k]
+		for i := k + 1; i < len(A.data) ; i++{
+			L.data[i][k] = A_copy.data[i][k] / D.data[k][k]
+			for j:= k + 1; j <= i; j++{
+				A_copy.data[i][j] -= L.data[i][k] * A_copy.data[j][k]
+			}
+		}
+	}
+
+	D.data[len(A.data) - 1][len(A.data) - 1] = A_copy.data[len(A.data) - 1][len(A.data) - 1]
+	Lt := L.Transpose()
+	fmt.Println(L.ToString())
+	fmt.Println(D.ToString())
+
+	z := Gauss(L, b)
+	y :=GaussReverse(D, z)
+	x := GaussReverse(Lt, y)
+	fmt.Println(x.ToStringF())
+	//fmt.Println(b.ToStringF())
 
 	// метод отражений
 	deg := len(A.data)
@@ -332,7 +375,7 @@ func main() {
 		R = Qi.MultMatrix(R)
 		R.ClearZeros()
 		QArr = append(QArr, Qi)
-		fmt.Println(Qi.ToString())
+		//fmt.Println(Qi.ToString())
 	}
 
 	fmt.Printf("\n==============================================\n\n")
@@ -353,8 +396,10 @@ func main() {
 	Qtb := Q.Transpose().OperateVector(b)
 	solution := GaussReverse(R, Qtb)
 	fmt.Println(solution.ToStringF())
+	fmt.Println(x.ToStringF())
 	fmt.Println(b.ToStringF())
 	fmt.Println(A.OperateVector(solution).ToStringF())
+	
 
 	fmt.Printf("\n==============================================\n\n")
 
