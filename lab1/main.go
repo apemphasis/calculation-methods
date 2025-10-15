@@ -178,7 +178,7 @@ func main() {
 
 	fmt.Println()
 
-	fmt.Print("Норма ||A - LDL^t|| (максимальная по строкам): ")
+	fmt.Print("Норма ||A - LDL^t|| (равномерная): ")
 	fmt.Println(A.Add(L.MultMatrix(D.MultMatrix(Lt)).MultAlpha(-1)).MaxRowNorm())
 
 	fmt.Printf("\n\n==========================  РЕШЕНИЕ С ПОМОЩЬЮ LDL^t  ==========================\n\n")
@@ -200,7 +200,7 @@ func main() {
 
 	fmt.Println()
 
-	fmt.Print("Норма ||E - AA^(-1)|| (максимальная по строкам): ")
+	fmt.Print("Норма ||E - AA^(-1)|| (равномерная): ")
 
 	E := NewSquareMatrix(15)
 	for i := range(E.data){
@@ -221,7 +221,7 @@ func main() {
 
 	fmt.Println()
 
-	fmt.Print("Норма ||A - QR|| (максимальная по строкам): ")
+	fmt.Print("Норма ||A - QR|| (равномерная): ")
 	fmt.Println(A.Add(Q.MultMatrix(R).MultAlpha(-1)).MaxRowNorm())
 
 	fmt.Printf("\n\n==========================  РЕШЕНИЕ МЕТОДОМ ОТРАЖЕНИЙ  ==========================\n\n")
