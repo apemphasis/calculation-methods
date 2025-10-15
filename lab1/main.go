@@ -1,58 +1,9 @@
-package main //Kozlovsky_13gr_5v
+package main //Козловский Евгений, 13 группа, 5 вариант
 
 import (
 	"fmt"
 	"math"
 )
-
-type Vector struct {
-	data []float64
-}
-
-func NewVector(deg int) *Vector{
-	data := make([]float64, deg)
-	return &Vector{data: data}
-}
-
-func NewVectorFromData(data []float64) *Vector{
-	new_data := make([]float64, len(data))
-	copy(new_data, data)
-	return &Vector{data: new_data}
-}
-
-func (v *Vector) Abs() float64 {
-	var res float64
-
-	for _, el := range v.data {
-		res += el * el
-	}
-
-	return math.Sqrt(res)
-}
-
-func (v *Vector) Add(other * Vector) *Vector {
-	res := NewVector(len(v.data))
-	for i := range(res.data){
-		res.data[i] = v.data[i] + other.data[i]
-	}
-	return res
-}
-
-func (v *Vector) MultAlpha(a float64) *Vector {
-	res := NewVectorFromData(v.data)
-	for i := range(res.data) {
-		res.data[i] *= a 
-	}
-	return res
-} 
-
-func (v *Vector) ClearZeros() {
-	for i := range(v.data){
-		if math.Abs(v.data[i]) < 1e-10{
-			v.data[i] = 0
-		}
-	}
-}
 
 func CountW(s *Vector) *Vector {
 
@@ -88,216 +39,9 @@ func CountH(w *Vector) *SquareMatrix {
 	return res
 }
 
-func (m *SquareMatrix) CountQ(col int) *SquareMatrix {
-	W := CountW(m.GetCol(col))
+func (m *SquareMatrix) CountQ() *SquareMatrix {
+	W := CountW(m.GetCol(0))
 	return CountH(W)
-}
-
-func (v *Vector) ToString() string {
-	res := ""
-	for i := range(v.data){
-		if v.data[i] == 0 {
-				res += fmt.Sprintf("%12d", 0)
-		}else{
-			res += fmt.Sprintf("%12.5f", v.data[i])
-		}
-	}
-
-	return res
-}
-
-func (v *Vector) ToStringF() string {
-	res := ""
-	for i := range(v.data){
-		if v.data[i] == 0 {
-				res += fmt.Sprintf("%12d", 0)
-		}else{
-			res += fmt.Sprintf("%12.5f", v.data[i])
-		}
-	}
-
-	return res
-}
-
-type SquareMatrix struct {
-	data [][]float64
-}
-
-func NewSquareMatrixFromData(data [][]float64) *SquareMatrix {
-	n := len(data)
-
-	new_data := make([][]float64, n)
-
-	for i := range new_data {
-		new_data[i] = make([]float64, n)
-		copy(new_data[i], data[i])
-	}
-
-	return &SquareMatrix{data: new_data}
-}
-
-func NewSquareMatrix(deg int) *SquareMatrix {
-	new_data := make([][]float64, deg)
-	for i := range(new_data){
-		new_data[i] = make([]float64, deg)
-	}
-	return &SquareMatrix{data: new_data}
-}
-
-func (m *SquareMatrix) GetCol(idx int) *Vector{
-	res := NewVector(len(m.data))
-
-	for i := range(m.data){
-		res.data[i] = m.data[i][idx]
-	}
-
-	return res
-}
-
-func (m *SquareMatrix) Add(other *SquareMatrix) *SquareMatrix {
-	res := NewSquareMatrix(len(m.data))
-	for i := range res.data {
-		for j := range res.data[i] {
-			res.data[i][j] = m.data[i][j] +  other.data[i][j]
-		}
-	}
-	return res
-}
-
-func (m *SquareMatrix) MultMatrix(other *SquareMatrix) *SquareMatrix {
-	res := NewSquareMatrix(len(m.data))
-
-	for i := range res.data {
-		for j := range res.data[i] {
-			var sum float64
-			for k := range m.data {
-				sum += m.data[i][k] * other.data[k][j]
-			}
-			res.data[i][j] = sum
-		}
-	}
-
-	return res
-}
-
-func (m *SquareMatrix) MultAlpha(a float64) *SquareMatrix {
-	res := NewSquareMatrixFromData(m.data)
-	for i := range(res.data) {
-		for j := range(res.data[i]){
-			res.data[i][j] *= a 
-		}
-	}
-	return res
-} 
-
-func (m *SquareMatrix) Transpose() *SquareMatrix {
-	res := NewSquareMatrix(len(m.data))
-
-	for i := range(res.data){
-		for j := range(res.data[i]){
-			res.data[i][j] = m.data[j][i]
-		}
-	}
-	return res
-}
-
-func (m *SquareMatrix) OperateVector(v *Vector) *Vector {
-	res := NewVector(len(v.data))
-
-	for i := range(m.data) {
-		sum := 0.0
-		for j := range(m.data[i]){
-			sum += m.data[i][j] * v.data[j]
-		}
-		res.data[i] = sum
-	}
-	res.ClearZeros()
-	return res
-}
-
-func (m *SquareMatrix) ExtractMatrix(xStart, xEnd, yStart, yEnd int) *SquareMatrix{
-	res := NewSquareMatrix(xEnd + 1 - xStart)
-	for i:= range(res.data){
-		for j := range(res.data[i]){
-			res.data[i][j] = m.data[yStart + i][xStart + j]
-		}
-	}
-	return res
-}
-
-func (m *SquareMatrix) CompleteMatrix(deg int) *SquareMatrix {
-	res := NewSquareMatrix(deg)
-	start := deg - len(m.data)
-	for i := range(res.data){
-		for j := range(res.data[i]){
-			if i >= start && j >= start {
-				res.data[i][j] = m.data[i - start][j - start]
-			}else if i == j{
-				res.data[i][j] = 1
-			}
-		}
-	}
-	return res
-}
-
-func (m *SquareMatrix) ClearZeros() {
-	for i := range(m.data){
-		for j := range(m.data[i]){
-			if math.Abs(m.data[i][j]) < 1e-10{
-				m.data[i][j] = 0
-			}
-		}
-	}
-} //! CLEAR ZEROS
-
-func (m *SquareMatrix) ToString() string {
-	
-	res := ""
-	for i := range (m.data) {
-		for j := range( m.data[i]) {
-			if m.data[i][j] == 0 {
-				res += fmt.Sprintf("%12d", 0)
-			}else{
-				res += fmt.Sprintf("%12.5f", m.data[i][j])
-			}
-		}
-		res += "\n"
-	}
-	return res
-}
-
-func GaussReverse(m *SquareMatrix, b *Vector) *Vector {
-	n := len(b.data)
-
-	solution := NewVector(n)
-	solution.data[n - 1] = b.data[n-1] / m.data[n-1][n-1]
-
-	for i := n - 2; i >= 0; i--{
-		sum := 0.0
-		for j := 1; i + j < n; j++ {
-			sum -= m.data[i][i+j] * solution.data[i + j]
-		}
-		solution.data[i] = (sum + b.data[i]) / m.data[i][i]
-	}
-
-	return solution
-}
-
-func Gauss(m *SquareMatrix, b *Vector) *Vector {
-	n := len(b.data)
-
-	solution := NewVector(n)
-	solution.data[0] = b.data[0] / m.data[0][0]
-
-	for i := 1; i < n; i++{
-		sum := 0.0
-		for j := 0; j < i; j++ {
-			sum -= m.data[i][j] * solution.data[j]
-		}
-		solution.data[i] = (sum + b.data[i]) / m.data[i][i]
-	}
-
-	return solution
 }
 
 func (m *SquareMatrix) FindLDLt() (*SquareMatrix, *SquareMatrix, *SquareMatrix) {
@@ -355,12 +99,10 @@ func (m *SquareMatrix) FindQR() (*SquareMatrix, *SquareMatrix) {
 	R := NewSquareMatrixFromData(m.data)
 	QArr := make([]*SquareMatrix, 0, deg - 1)
 	for i := range(deg - 1){
-		H := R.ExtractMatrix(i, deg - 1, i, deg - 1).CountQ(0)
+		H := R.ExtractMatrix(i, deg - 1, i, deg - 1).CountQ()
 		Qi := H.CompleteMatrix(deg)
-		Qi.ClearZeros()
 		
 		R = Qi.MultMatrix(R)
-		R.ClearZeros()
 		QArr = append(QArr, Qi)
 	}
 
@@ -373,10 +115,19 @@ func (m *SquareMatrix) FindQR() (*SquareMatrix, *SquareMatrix) {
 }
 
 func (m *SquareMatrix) SolveByQR(b *Vector) *Vector{
-	Q, R := m.FindQR()
 
-	Qtb := Q.Transpose().OperateVector(b)
-	solution := GaussReverse(R, Qtb)
+	deg := len(m.data)
+	R := NewSquareMatrixFromData(m.data)
+	bi := NewVectorFromData(b.data)
+	for i := range(deg - 1){
+		H := R.ExtractMatrix(i, deg - 1, i, deg - 1).CountQ()
+		Qi := H.CompleteMatrix(deg)
+		
+		R = Qi.MultMatrix(R)
+		bi = Qi.OperateVector(bi)
+	}
+
+	solution := GaussReverse(R, bi)
 
 	return solution
 }
@@ -402,7 +153,7 @@ func main() {
 		b_data[i] = 4.5 * math.Sqrt(float64(i + 1))
 	}
 
-	fmt.Printf("\n==========================  INPUT DATA  ==========================\n\n")
+	fmt.Printf("\n==========================  ВХОДНЫЕ ДАННЫЕ  ==========================\n\n")
 
 	A := NewSquareMatrixFromData(A_data)
 	b := NewVectorFromData(b_data)
@@ -413,10 +164,9 @@ func main() {
 	fmt.Println("b:")
 	fmt.Println(b.ToString())
 
-	fmt.Printf("\n\n==========================  LDL^t DECOMPOSITION  ==========================\n\n")
-
+	fmt.Printf("\n\n==========================  LDL^t РАЗЛОЖЕНИЕ  ==========================\n\n")
+	
 	L, D, Lt := A.FindLDLt()
-
 	fmt.Println("L:")
 	fmt.Println(L.ToString())
 
@@ -426,21 +176,40 @@ func main() {
 	fmt.Println("L^t:")
 	fmt.Println(Lt.ToString())
 
-	fmt.Printf("\n\n==========================  SOLVE BY LDL^t  ==========================\n\n")
+	fmt.Println()
+
+	fmt.Print("Норма ||A - LDL^t|| (максимальная по строкам): ")
+	fmt.Println(A.Add(L.MultMatrix(D.MultMatrix(Lt)).MultAlpha(-1)).MaxRowNorm())
+
+	fmt.Printf("\n\n==========================  РЕШЕНИЕ С ПОМОЩЬЮ LDL^t  ==========================\n\n")
 
 	x := A.SolveByLDLt(b)
 
-	fmt.Println("SOLUTION:")
-	fmt.Println(x.ToStringF())
+	fmt.Println("Решение:")
+	fmt.Println(x.ToString())
+	fmt.Println()
+	fmt.Print("Норма невязки (евклидова): ")
+	fmt.Println(b.Add(A.OperateVector(x).MultAlpha(-1)).Abs())
 
-	fmt.Printf("\n\n==========================  INVERSE BY LDL^t  ==========================\n\n")
+	fmt.Printf("\n\n==========================  ОБРАТНАЯ С ПОМОЩЬЮ LDL^t  ==========================\n\n")
 
 	inverseA := A.FindInverse()
 
-	fmt.Println("INVERSED:")
+	fmt.Println("Обратная:")
 	fmt.Println(inverseA.ToString())
 
-	fmt.Printf("\n\n==========================  QR DECOMPOSITION  ==========================\n\n")
+	fmt.Println()
+
+	fmt.Print("Норма ||E - AA^(-1)|| (максимальная по строкам): ")
+
+	E := NewSquareMatrix(15)
+	for i := range(E.data){
+		E.data[i][i] = 1
+	}
+
+	fmt.Println(E.Add(A.MultMatrix(A.FindInverse()).MultAlpha(-1)).MaxRowNorm())
+
+	fmt.Printf("\n\n==========================  QR РАЗЛОЖЕНИЕ  ==========================\n\n")
 
 	Q, R := A.FindQR()
 
@@ -450,22 +219,20 @@ func main() {
 	fmt.Println("R:")
 	fmt.Println(R.ToString())
 
-	fmt.Printf("\n\n==========================  SOLVE BY QR  ==========================\n\n")
+	fmt.Println()
+
+	fmt.Print("Норма ||A - QR|| (максимальная по строкам): ")
+	fmt.Println(A.Add(Q.MultMatrix(R).MultAlpha(-1)).MaxRowNorm())
+
+	fmt.Printf("\n\n==========================  РЕШЕНИЕ МЕТОДОМ ОТРАЖЕНИЙ  ==========================\n\n")
 
 	solution := A.SolveByQR(b)
 
-	fmt.Println("SOLUTION:")
-	fmt.Println(solution.ToStringF())
+	fmt.Println("Решение:")
+	fmt.Println(solution.ToString())
+	fmt.Println()
+	fmt.Print("Норма невязки (евклидова): ")
+	fmt.Println(b.Add(A.OperateVector(solution).MultAlpha(-1)).Abs())
 	
-	fmt.Printf("\n\n==========================  TEST  ==========================\n\n")
-
-	fmt.Println("L * D * L^t:")
-	fmt.Println(L.MultMatrix(D.MultMatrix(Lt)).ToString())
-
-	fmt.Println("Q * R:")
-	QR := Q.MultMatrix(R)
-	fmt.Println(QR.ToString())
-
-	// fmt.Println("A:")
-	// fmt.Println(A.ToString())
+	fmt.Println()
 }
