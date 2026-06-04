@@ -14,7 +14,7 @@ func f(x float64) float64 {
 }
 
 var ACTUAl float64 = 2* math.Log(2) - 0.75
-var ACTUAl_2 float64 = math.Sqrt(math.Pi) * math.Exp(0.25)
+var ACTUAl_2 float64 = (math.Sqrt(math.Pi) * math.Exp(0.25))/8.0
 
 func evalSimpson(N, h float64) float64 {
 	sum := 0.0
@@ -75,7 +75,7 @@ func calcHByRunge(method func(float64, float64) float64, m float64) float64 {
 	
 	e := 1.0
 	k := 1
-	for math.Abs(e) > eps && k > 1 {
+	for math.Abs(e) > eps || k <= 1 {
 		Ih := method(N, (b-a)/N)
 		Ih2 := method(2*N,(b-a)/N/2)
 		e = (Ih2-Ih)/(math.Pow(2, m)-1)
@@ -135,15 +135,15 @@ func main() {
 	N2 = calcHByRunge(evalRightRectangles, 1)
 	h2 = (b-a)/N2
 
-	sum = evalSimpsonOdd(N2, h2)
+	sum = evalRightRectangles(N2, h2)
 	fmt.Printf("N: %.f; h: %e\n", N2, h2)
 	fmt.Println(sum)
 	fmt.Println(ACTUAl)
 	fmt.Printf("Погрешность: %e\n\n", math.Abs(sum - ACTUAl))
 
-	sum = KF_NAST(32)
+	sum = KF_NAST(8)
 
-	fmt.Printf("\nЗначение при n: %d       = %f\n", 32, sum)
+	fmt.Printf("\nЗначение при n: %d       = %f\n", 8, sum)
 	fmt.Printf("Погрешность: %e\n\n", math.Abs(sum - ACTUAl_2))
 }
 
